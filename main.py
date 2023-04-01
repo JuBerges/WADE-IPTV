@@ -1,5 +1,6 @@
-import pygame
 import subprocess
+import tkinter as tk
+from tkinter import ttk
 from helpers.get_vlc_path import find_vlc_executable
 
 # Charger le fichier M3U
@@ -20,77 +21,67 @@ for line in m3u_file:
         # Lire l'URL de la chaîne
         channels[-1]["url"] = line.strip()
 
-# Initialiser Pygame
-pygame.init()
-# Créer une fenêtre
-window = pygame.display.set_mode((800, 600))
-# Charger une police de caractères pour afficher le texte
-font = pygame.font.Font(None, 24)
-
 # Définir les couleurs
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-PINK = (255, 200, 200)
-# Variable pour stocker la chaîne sélectionnée
-selected_channel = None
+WHITE = "#ffffff"
+BLACK = "#000000"
+PINK = "#ffc8c8"
+GRAY = "#cccccc"
+BLUE = "#007bff"
 
-# Boucle principale pour afficher l'interface graphique
-while selected_channel is None:
-    # Traiter les événements
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            selected_channel = "EXIT"
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            # Récupérer les coordonnées de la souris
-            mouse_x, mouse_y = event.pos
+class Application(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.master.title("Lecteur IPTV")
+        self.master.geometry("500x400")
+        self.master.configure(bg=WHITE)
+        self.create_widgets()
 
-            # Vérifier si la souris a cliqué sur un bouton
-            for i, channel in enumerate(channels):
-                # Calculer les coordonnées du bouton
-                button_x = 10
-                button_y = 10 + i * 30
-                button_w = 780
-                button_h = 24
+    def create_widgets(self):
+        # Ajouter un label pour le titre
+        title_label = tk.Label(self.master, text="Liste des chaînes", font=("Helvetica", 20), bg=WHITE, fg=BLACK)
+        title_label.pack(pady=20)
 
-                # Vérifier si la souris a cliqué sur le bouton
-                if (button_x <= mouse_x <= button_x + button_w) and (button_y <= mouse_y <= button_y + button_h):
-                    selected_channel = channel
-                    break
+        # Créer un frame pour la liste des chaînes
+        channel_frame = tk.Frame(self.master, bg=WHITE)
+        channel_frame.pack(side="left", fill="y")
 
-    # Effacer l'écran
-    window.fill(BLACK)
+        # Ajouter un canvas pour la liste des chaînes
+        channel_canvas = tk.Canvas(channel_frame, bg=WHITE, highlightthickness=0)
+        channel_canvas.pack(side="left", fill="y")
 
-    # Afficher les boutons pour chaque chaîne
-    for i, channel in enumerate(channels):
-        # Calculer les coordonnées du bouton
-        button_x = 10
-        button_y = 10 + i * 30
-        button_w = 780
-        button_h = 24
+        # Ajouter un scrollbar pour la liste des chaînes
+        channel_scrollbar = ttk.Scrollbar(channel_frame, orient="vertical", command=channel_canvas.yview)
+        channel_scrollbar.pack(side="right", fill="y")
 
-        # Dessiner un rectangle pour le bouton
-        pygame.draw.rect(window, PINK, (button_x, button_y, button_w, button_h))
+        channel_canvas.configure(yscrollcommand=channel_scrollbar.set)
+        channel_canvas.bind("<Configure>", lambda e: channel_canvas.configure(scrollregion=channel_canvas.bbox("all")))
 
-        # Afficher le nom de la chaîne sur le bouton
-        text = font.render(channel["name"], True, BLACK)
-        text_rect = text.get_rect()
-        text_rect.center = (button_x + button_w // 2, button_y + button_h // 2)
-        window.blit(text, text_rect)
+        # Ajouter un frame pour les boutons de chaque chaîne
+        channel_buttons = tk.Frame(channel_canvas, bg=WHITE) 
+        channel_canvas.create_window((0, 0), window=channel_buttons, anchor="nw")
 
-    # Mettre à jour l'affichage
-    pygame.display.update()
+        # Créer une liste de boutons pour chaque chaîne
+        self.channel_btns = []
+        for i, channel in enumerate(channels):
+            # Créer un bouton pour la chaîne
+            channel_btn = tk.Button(channel_buttons, text=channel["name"], width=40, height=2,
+                                    bg=GRAY, fg=BLACK,
+                                    activebackground=BLUE, activeforeground=WHITE,
+                                    font=("Helvetica", 12),
+                                    command=lambda url=channel["url"]: self.play_channel(url))
+            channel_btn.pack(pady=5)
 
-# Si l'utilisateur a quitté l'application, quitter
-if selected_channel == "EXIT":
-    pygame.quit()
-    exit()
-vlc_path = find_vlc_executable()
-# Lire la chaîne sélectionnée
-#print(selected_channel["url"])
-#print(vlc_path)
-if vlc_path  != None:
-    # Exécutez la commande "vlc" avec le lien m3u8 en tant qu'argument
-    subprocess.run([vlc_path, selected_channel["url"]])
+            self.channel_btns.append(channel_btn)
 
+    def play_channel(self, url):
+        vlc_path = find_vlc_executable()
 
+        if vlc_path is not None:
+            # Exécuter la commande "vlc" avec le lien m3u8 en tant qu'argument
+            subprocess.Popen([vlc_path, url])
 
+root = tk.Tk()
+app = Application(master=root)
+app.mainloop()
+ 

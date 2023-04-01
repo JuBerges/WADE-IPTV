@@ -59,6 +59,8 @@ class Application(tk.Frame):
         # Créer un frame pour la liste des chaînes
         channel_frame = tk.Frame(self.master, bg=WHITE)
         channel_frame.pack(side="left", fill="y")
+        # Centrer l'élément dans le cadre en utilisant la méthode place
+        channel_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         # Ajouter un canvas pour la liste des chaînes
         channel_canvas = tk.Canvas(channel_frame, bg=WHITE, highlightthickness=0)

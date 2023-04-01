@@ -46,24 +46,25 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-        self.master.title("Lecteur IPTV")
+        self.master.title("Wade IPTV")
         self.master.geometry("500x400")
-        self.master.configure(bg=WHITE)
+        self.master.configure(bg=BLUE)
         self.create_widgets()
 
     def create_widgets(self):
         # Ajouter un label pour le titre
-        title_label = tk.Label(self.master, text="Liste des chaînes", font=("Helvetica", 20), bg=WHITE, fg=BLACK)
+        
+        title_label = tk.Label(self.master, text="Liste des chaînes", font=("Impact", 24), bg=BLUE, fg=WHITE)
         title_label.pack(pady=20)
 
         # Créer un frame pour la liste des chaînes
-        channel_frame = tk.Frame(self.master, bg=WHITE)
+        channel_frame = tk.Frame(self.master, bg=BLUE)
         channel_frame.pack(side="left", fill="y")
         # Centrer l'élément dans le cadre en utilisant la méthode place
         channel_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         # Ajouter un canvas pour la liste des chaînes
-        channel_canvas = tk.Canvas(channel_frame, bg=WHITE, highlightthickness=0)
+        channel_canvas = tk.Canvas(channel_frame, bg=BLUE, highlightthickness=0)
         channel_canvas.pack(side="left", fill="y")
 
         # Ajouter un scrollbar pour la liste des chaînes
@@ -74,7 +75,7 @@ class Application(tk.Frame):
         channel_canvas.bind("<Configure>", lambda e: channel_canvas.configure(scrollregion=channel_canvas.bbox("all")))
 
         # Ajouter un frame pour les boutons de chaque chaîne
-        channel_buttons = tk.Frame(channel_canvas, bg=WHITE) 
+        channel_buttons = tk.Frame(channel_canvas, bg=BLUE) 
         channel_canvas.create_window((0, 0), window=channel_buttons, anchor="nw")
 
         # Créer une liste de boutons pour chaque chaîne
@@ -82,7 +83,7 @@ class Application(tk.Frame):
         for i, channel in enumerate(channels):
             # Créer un bouton pour la chaîne
             channel_btn = tk.Button(channel_buttons, text=channel["name"], width=40, height=2,
-                                    bg=GRAY, fg=BLACK,
+                                    bg=WHITE, fg=BLUE,
                                     activebackground=BLUE, activeforeground=WHITE,
                                     font=("Helvetica", 12),
                                     command=lambda url=channel["url"]: self.play_channel(url))

@@ -3,8 +3,14 @@ import tkinter as tk
 from tkinter import ttk
 from helpers.get_vlc_path import find_vlc_executable
 
-# Charger le fichier M3U
-m3u_file = open("./data/jpn.m3u")
+# Définir les couleurs
+WHITE = "#ffffff"
+BLACK = "#000000"
+PINK = "#ffc8c8"
+GRAY = "#cccccc"
+BLUE = "#007bff"
+# Charge le fichier M3U
+m3u_file = open("./assets/jpn.m3u")
 
 # Lire chaque ligne du fichier M3U et enregistrer les informations sur les chaînes dans une liste
 channels = []
@@ -21,13 +27,9 @@ for line in m3u_file:
         # Lire l'URL de la chaîne
         channels[-1]["url"] = line.strip()
 
-# Définir les couleurs
-WHITE = "#ffffff"
-BLACK = "#000000"
-PINK = "#ffc8c8"
-GRAY = "#cccccc"
-BLUE = "#007bff"
 
+class ErrorVLC(Exception):
+    pass
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -80,6 +82,8 @@ class Application(tk.Frame):
         if vlc_path is not None:
             # Exécuter la commande "vlc" avec le lien m3u8 en tant qu'argument
             subprocess.Popen([vlc_path, url])
+        else:
+            raise ErrorVLC("Vous devez avoir VLC d'installé !")
 
 root = tk.Tk()
 app = Application(master=root)
